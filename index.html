@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>HelloWorld DApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+</head>
+<body>
+  <h2>HelloWorld DApp</h2>
+  <button id="connect">Connect Wallet</button>
+  <button id="getMsg">Get Message</button>
+  <input id="newMsg" placeholder="New Message"/>
+  <button id="setMsg">Set Message</button>
+  <p id="output"></p>
+
+<script>
+const contractAddress = "0xcD6f3fB3cD06140089BC860712c9D05595E31dfF";//address pasted bro!
+const abi = [
+{
+"inputs": [
+{
+"internalType": "string",
+"name": "newMemory",
+"type": "string"
+}
+],
+"name": "setMessage",
+"outputs": [],
+"stateMutability": "nonpayable",
+"type": "function"
+},
+{
+"inputs": [],
+"name": "message",
+"outputs": [
+{
+"internalType": "string",
+"name": "",
+"type": "string"
+}
+],
+"stateMutability": "view",
+"type": "function"
+}
+];
+
+let provider, signer, contract;
+
+document.getElementById("connect").onclick = async () => {
+  provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = provider.getSigner();
+  contract = new ethers.Contract(contractAddress, abi, signer);
+  alert("Wallet connected: " + await signer.getAddress());
+};
+
+document.getElementById("getMsg").onclick = async () => {
+  const msg = await contract.message();
+  document.getElementById("output").innerText = "Message: " + msg;
+};
+
+document.getElementById("setMsg").onclick = async () => {
+  const newMsg = document.getElementById("newMsg").value;
+  const tx = await contract.setMessage(newMsg);
+  await tx.wait();
+  alert("Message updated!");
+};
+</script>
+</body>
+</html>
